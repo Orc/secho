@@ -36,9 +36,7 @@ FILE* output = 0;	/* output file, changed by -f */
 int counter = 0;	/* # of lines, for -N & -C */
 char *pgm = 0;
 
-#define MAXRE 10
-regex_t regex[MAXRE];	/* regexes to match against */
-int nrregex = 0;
+STRING(regex_t) regex;
 
 Cstring oline;
 Cstring arg, command;
@@ -175,8 +173,8 @@ match_re(char *text)
 {
     int i;
 
-    for ( i=0; i < nrregex; i++)
-	if ( regexec(&regex[i], text, 0, 0, 0) != 0 )
+    for ( i=0; i < S(regex); i++)
+	if ( regexec(&T(regex)[i], text, 0, 0, 0) != 0 )
 	    return 0;
     return 1;
 }
@@ -303,17 +301,12 @@ add_re(char *pat)
     int rc;
     char oops[80];
 
-    if ( nrregex >= MAXRE-1 )
-	die("too many regular expressions! (max %d)", MAXRE);
-
-    rc = regcomp(&regex[nrregex], pat, REG_BASIC);
+    rc = regcomp(&EXPAND(regex), pat, REG_BASIC);
 
     if ( rc ) {
-	regerror(rc, &regex[nrregex], oops, sizeof oops);
+	regerror(rc, &T(regex)[S(regex)-1], oops, sizeof oops);
 	die("%s: %s", pat, oops);
     }
-
-    ++nrregex;
 }
 
 
@@ -382,10 +375,6 @@ char **argv;
     case 2: output = 0;
     }
 
-    CREATE(arg);
-    CREATE(command);
-    CREATE(oline);
-    
     if ( filename ) {
 	FILE* input;
 

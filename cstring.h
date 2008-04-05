@@ -14,11 +14,12 @@
  */
 #define STRING(type)	struct { type *text; int size, alloc; }
 
-#define RESERVE(x,c)	(x).text = malloc(sizeof T(x)[0] * (((x).size=0),((x).alloc=(c))) )
+#define RESERVE(x,c)	T(x) = malloc(sizeof T(x)[0] * ((S(x)=0),((x).alloc=(c))) )
 #define CREATE(x)	RESERVE(x,100)
-#define EXPAND(x)	((x).size++)[((x).size < (x).alloc) \
-			    ? ((x).text) \
-			    : ((x).text = realloc((x).text, sizeof T(x)[0] * ((x).alloc += 100)))]
+#define EXPAND(x)	(S(x)++)[(S(x) < (x).alloc) \
+			    ? (T(x)) \
+			    : (T(x) = T(x) ? realloc(T(x), sizeof T(x)[0] * ((x).alloc += 100)) \
+					   : malloc(sizeof T(x)[0] * ((x).alloc += 100)) )]
 
 #define DELETE(x)	(x).alloc ? (free(T(x)), S(x) = (x).alloc = 0) \
 				  : ( S(x) = 0 )
@@ -29,7 +30,8 @@
 
 #define STRINGCAT(t,p,sz)	\
 	    memcpy(((S(t) += (sz)) - (sz)) + \
-		    ((t).text = realloc((t).text, sizeof T(t)[0] * ((t).alloc += sz))), \
+		    (T(t) = T(t) ? realloc(T(t), sizeof T(t)[0] * ((t).alloc += sz)) \
+				 : malloc(sizeof T(t)[0] * ((t).alloc += sz))), \
 		    (p), sizeof(T(t)[0])*(sz))
 
 /* reference-style links (and images) are stored in an array
