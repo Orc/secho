@@ -27,6 +27,11 @@
 	    (memmove(&T(t)[i], &T(t)[i+sz], (S(t)-(i+sz)+1)*sizeof(T(t)[0])), \
 		S(t) -= (sz)) : -1
 
+#define STRINGCAT(t,p,sz)	\
+	    memcpy(((S(t) += (sz)) - (sz)) + \
+		    ((t).text = realloc((t).text, sizeof T(t)[0] * ((t).alloc += sz))), \
+		    (p), sizeof(T(t)[0])*(sz))
+
 /* reference-style links (and images) are stored in an array
  */
 #define T(x)		(x).text

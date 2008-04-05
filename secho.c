@@ -83,8 +83,7 @@ Cprintf(Cstring *arg, char *fmt, ...)
     size = vasprintf(&result, fmt, ptr);
     va_end(ptr);
 
-    for (i=0; i < size; i++)
-	EXPAND(*arg) = result[i];
+    STRINGCAT(*arg, result, size);
 
     free(result);
 }
@@ -100,8 +99,7 @@ docommand(FILE *out)
     for (i=0; cmd[i]; i++) {
 	if ( (cmd[i] == '$') && (cmd[i+1] == '?') ) {
 	    ++i;
-	    for (j=0; j < S(arg); j++)
-		EXPAND(command) = T(arg)[j];
+	    STRINGCAT(command, T(arg), S(arg));
 	}
 	else
 	    EXPAND(command) = cmd[i];
@@ -410,7 +408,7 @@ char **argv;
 
     if ( output )  {
 	flush(output);
-	if ( !nonl && !( plan9e && (counter == 0)) )
+	if ( !(nonl || (plan9e && (counter == 0))) )
 	    putc('\n', output);
     }
     
