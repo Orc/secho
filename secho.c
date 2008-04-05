@@ -40,9 +40,7 @@ char *pgm = 0;
 regex_t regex[MAXRE];	/* regexes to match against */
 int nrregex = 0;
 
-int xp = 0;
-
-
+Cstring oline;
 Cstring arg, command;
 
 
@@ -186,14 +184,63 @@ match_re(char *text)
 }
 
 
+flush(FILE *out)
+{
+    fwrite(T(oline), S(oline), 1, out);
+    S(oline) = 0;
+}
+
+
+printc(char c, FILE *out)
+{
+    if ( width ) {
+	int tb;
+	if ( c == '\t' ) {
+	    if ( !(tb = S(oline)%8) )
+		tb = 8;
+
+	    while (tb-- > 0)
+		printc(' ', out);
+	}
+	if ( c == '\n' || c == '' ) {
+	    flush(out);
+	    putc(c, out);
+	}
+	else {
+	    if ( S(oline) >= width ) {
+		int eol;
+		if ( wordwrap ) {
+
+		    for ( eol=S(oline)-1; (eol > 0) && !isspace(T(oline)[eol-1]); --eol)
+			;
+		    if ( eol <= 0 ) eol = width;
+		}
+		else
+		    eol = width;
+		    
+		fwrite(T(oline), eol, 1, out);
+		putc('\n', out);
+		CLIP(oline,0,eol);
+	    }
+	    EXPAND(oline) = c;
+	}
+    }
+    else
+	putc(c, out);
+}
+
+
 void
 printarg(FILE *out)
 {
+    int i;
+
     if ( counter > 1 )
-	putc(outputdelim, out);
+	printc(outputdelim, out);
     if ( numbered )
-	fprintf(out, "%d\t", counter);
-    fwrite(T(arg), S(arg), 1, out);
+	Cprintf(&oline, "%d\t", counter);
+    for (i=0; i < S(arg); i++)
+	printc(T(arg)[i], out);
 }
 
 
@@ -339,6 +386,7 @@ char **argv;
 
     CREATE(arg);
     CREATE(command);
+    CREATE(oline);
     
     if ( filename ) {
 	FILE* input;
@@ -360,8 +408,11 @@ char **argv;
 	    cmdtokens(argv[i], output);
     }
 
-    if ( output && !nonl && !( plan9e && (counter == 0)) )
-	putc('\n', output);
+    if ( output )  {
+	flush(output);
+	if ( !nonl && !( plan9e && (counter == 0)) )
+	    putc('\n', output);
+    }
     
     if ( count )
 	fprintf( output ? output : stdout, "%d\n", counter);
