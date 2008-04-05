@@ -1,0 +1,101 @@
+.\"
+.Dd Apr 4, 2008
+.Dt SECHO 1
+.Os MASTODON
+.Sh NAME
+.Nm secho
+.Nd echo arguments in many silly ways
+.Sh SYNOPSIS
+.Nm
+.Op Fl 019abCDEeilmNnIqtuVvwXx
+.Op Fl B Ar base
+.Op Fl c Ar cmd
+.Op Fl d Ar char
+.Op Fl f Pa file
+.Op Fl L Ar len
+.Op Fl o Pa file
+.Op Fl r Ar re
+.Op Fl S Ar voice
+.Op Fl s Ar char
+.Op Ar args
+.Sh DESCRIPTION
+.Nm
+outputs its arguments. It takes the following switches:
+.Bl -tag -width "-S voice"
+.It Fl 0
+Separate output arguments with a null character.
+.It Fl 1
+One argument per line.
+.It Fl 9
+"Plan9 mode";  don't print a newline if there are no arguments.
+.It Fl a
+Output in ASCII. The default.
+.It Fl B Ar base
+Output in given base, 2..32. Unless -u also given, base > 10  shows lowercase.
+.It Fl b
+Output in binary.
+.It Fl C
+Don't echo anything, just print the number of fields.
+.It Fl c Ar cmd
+Run cmd on each argument, replacing $? with the argument itself.
+.It Fl D
+Output in decimal.
+.It Fl d Ar char
+Field delimiter. Default is end of argument.
+.It fl E
+Print to standard error instead of to standard output.
+.It Fl e
+Allow escape sequences
+.If Fl f Pa file
+Read from file, then from command line (if any).
+.It Fl i
+Read arguments from standard input.
+.It Fl L Ar len
+Line width set to len. Default is to ignore line lengths.
+.It Fl l
+Turn uppercase to lowercase.
+.It Fl m
+Multi-column output.
+.It Fl N
+One field per line, numbering each field.
+.It Fl n
+Suppress newline.
+.It Fl O
+Output in octal.
+.It Fl o Pa file
+Write to file instead of standard output.
+.It Fl q
+"Quiet mode:" redirect output to /dev/null if not to a file.
+.It Fl r Ar re
+Print every string that matches each regular expression. Regular  
+expressions cannot contain + or * modifiers.
+.It Fl S Ar voice
+Send to speaker, having the given voice say it. If voice is  
+a null string, use the default voice.
+.It Fl s Ar char
+Separate fields with char, default space.
+.It Fl t
+Separate fields with tabs.
+.It Fl u
+Convert lowercase to uppercase. With -B, output in uppercase  
+letters for base > 10.
+.It Fl V
+Strip non-printing characters.
+.It Fl v
+Make non-printing characters visible.
+.It Fl w
+If -l is given, word wrap instead of character wrap. Otherwise,   ignored.
+.It Fl X
+Output in uppercase hexadecimal.
+.If Fl x
+Output in lowercase hexadecimal.
+.Sh BUGS
+The ultimate echo, actually useful, but no one wants it.
+.Sh AUTHOR
+.An David Parsons
+.Pq Li orc@pell.chi.il.us
+(coding)
+.br
+.An Pietro Gagliardi
+.Pq Li pietro10@mac.com
+(inspiration, manpage)
