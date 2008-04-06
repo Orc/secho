@@ -1,0 +1,17 @@
+CC=@CC@
+bindir=@exedir@
+mandir=@mandir@
+
+secho: secho.c cstring.h
+	$(CC) -o secho secho.c
+
+clean:
+	rm -f secho secho.o
+
+spotless: clean
+	rm -f @GENERATED_FILES@
+
+install: secho
+	@INSTALL_PROGRAM@ secho $(bindir)
+	@INSTALL_DIR@ $(mandir)/man1
+	@INSTALL_DATA@ secho.1 $(mandir)/man1

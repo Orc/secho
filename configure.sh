@@ -18,6 +18,7 @@ case "$AC_CC $AC_CFLAGS" in
 esac
 
 if AC_CHECK_BASENAME; then
+    AC_DEFINE HAVE_BASENAME 1
     if AC_CHECK_HEADERS libgen.h; then
 	echo "#include <libgen.h>" >> $__cwd/config.h
     fi
@@ -33,7 +34,7 @@ main()
 }
 EOF
 
-LOGN "Checking if REG_BASIC is defined in regex.h"
+LOGN "Is REG_BASIC defined in regex.h? "
 if $AC_CC -c -o /tmp/ngc$$ /tmp/ngc$$.c $LIBS; then
     LOG " (yes)"
 else
@@ -42,4 +43,4 @@ else
 fi
 rm -f /tmp/ngc$$ /tmp/ngc$$.c
 
-AC_OUTPUT
+AC_OUTPUT Makefile

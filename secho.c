@@ -44,6 +44,16 @@ Cstring oline = { 0 };
 Cstring arg = { 0 }, command = { 0 };
 
 
+#ifndef HAVE_BASENAME
+char *
+basename(char *p)
+{
+    char *q = strrchr(p, '/');
+
+    return q ? (1+q) : p;
+}
+#endif
+
 void
 die(char *fmt, ...)
 {
