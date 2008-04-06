@@ -14,8 +14,7 @@
  */
 #define STRING(type)	struct { type *text; int size, alloc; }
 
-#define RESERVE(x,c)	T(x) = malloc(sizeof T(x)[0] * ((S(x)=0),((x).alloc=(c))) )
-#define CREATE(x)	RESERVE(x,100)
+#define CREATE(x)	T(x) = (void*)(S(x) = (x).alloc = 0)
 #define EXPAND(x)	(S(x)++)[(S(x) < (x).alloc) \
 			    ? (T(x)) \
 			    : (T(x) = T(x) ? realloc(T(x), sizeof T(x)[0] * ((x).alloc += 100)) \
@@ -28,6 +27,11 @@
 	    (memmove(&T(t)[i], &T(t)[i+sz], (S(t)-(i+sz)+1)*sizeof(T(t)[0])), \
 		S(t) -= (sz)) : -1
 
+#define RESERVE(x, sz)	T(x) = (S(x) >= (x).alloc + (sz) \
+			    ? T(x) \
+			    : T(x) \
+				? realloc(T(x), sizeof T(x)[0] * ((x).alloc = 100+(sz)+S(x))) \
+				: malloc(sizeof T(x)[0] * ((x).alloc = 100+(sz)+S(x))))
 #define STRINGCAT(t,p,sz)	\
 	    memcpy(((S(t) += (sz)) - (sz)) + \
 		    (T(t) = T(t) ? realloc(T(t), sizeof T(t)[0] * ((t).alloc += sz)) \

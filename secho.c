@@ -42,8 +42,6 @@ Cstring oline;
 Cstring arg, command;
 
 
-#define OPTSTRING	"?019abCDEeilmnNOqtuVvwXxB:c:d:f:L:o:r:S:s:"
-
 void
 die(char *fmt, ...)
 {
@@ -58,6 +56,8 @@ die(char *fmt, ...)
     exit(1);
 }
 
+
+#define OPTSTRING	"?019abCDEeilmnNOqtuVvwXxB:c:d:f:L:o:r:S:s:"
 
 void
 usage(int rc)
@@ -74,16 +74,26 @@ void
 Cprintf(Cstring *arg, char *fmt, ...)
 {
     va_list ptr;
-    char *result;
-    int i, size;
+    int avail, needed;
 
+    avail = (*arg).alloc - S(*arg);
+    
+    /* try writing the fmt into the existing
+     * Cstring, and if that fails reserve enough
+     * room to fit it and try again.
+     */
     va_start(ptr, fmt);
-    size = vasprintf(&result, fmt, ptr);
+    needed = vsnprintf(T(*arg)+S(*arg), avail, fmt, ptr);
     va_end(ptr);
 
-    STRINGCAT(*arg, result, size);
-
-    free(result);
+    if ( needed >= avail ) {
+	RESERVE(*arg, needed+2);
+	
+	va_start(ptr, fmt);
+	vsnprintf(T(*arg)+S(*arg), needed+1, fmt, ptr);
+	va_end(ptr);
+    }
+    S(*arg) += needed;
 }
 
 
@@ -152,13 +162,13 @@ outc(unsigned char c)
 		EXPAND(arg) = c & (1<<i) ? '1': '0';
 	    break;
     case OCTAL:
-	    Cprintf(&arg, " %o", c);
+	    Cprintf(&arg, " %03o", c);
 	    break;
     case DECIMAL:
-	    Cprintf(&arg, " %u", c);
+	    Cprintf(&arg, " %d", c);
 	    break;
     case HEX:
-	    Cprintf(&arg, (whichcase==UPPERCASE)?" %X":"%x", c);
+	    Cprintf(&arg, (whichcase==UPPERCASE)?" %02X":" %02x", c);
 	    break;
     default:
 	    EXPAND(arg) = ' ';
