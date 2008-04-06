@@ -5,7 +5,11 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdarg.h>
+#ifdef linux
+#include <unistd.h>
+#else
 #include <libgen.h>
+#endif
 #include <regex.h>
 
 #include "cstring.h"
@@ -36,10 +40,10 @@ FILE* output = 0;	/* output file, changed by -f */
 int counter = 0;	/* # of lines, for -N & -C */
 char *pgm = 0;
 
-STRING(regex_t) regex;
+STRING(regex_t) regex = { 0 };
 
-Cstring oline;
-Cstring arg, command;
+Cstring oline = { 0 };
+Cstring arg = { 0 }, command = { 0 };
 
 
 void
@@ -75,6 +79,9 @@ Cprintf(Cstring *arg, char *fmt, ...)
 {
     va_list ptr;
     int avail, needed;
+
+    if ( (*arg).alloc <= S(*arg) )
+	RESERVE(*arg,100);
 
     avail = (*arg).alloc - S(*arg);
     
@@ -311,6 +318,9 @@ add_re(char *pat)
     int rc;
     char oops[80];
 
+#ifndef REG_BASIC
+#define REG_BASIC 0
+#endif
     rc = regcomp(&EXPAND(regex), pat, REG_BASIC);
 
     if ( rc ) {
@@ -413,4 +423,5 @@ char **argv;
     
     if ( count )
 	fprintf( output ? output : stdout, "%d\n", counter);
+    exit(0);
 }
