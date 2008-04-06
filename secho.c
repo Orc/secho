@@ -8,6 +8,9 @@
 #include <getopt.h>
 #include <stdarg.h>
 #include <unistd.h>
+#if HAVE_LIBGEN_H
+# include <libgen.h>
+#endif
 #include <regex.h>
 
 #include "cstring.h"

@@ -17,12 +17,7 @@ case "$AC_CC $AC_CFLAGS" in
 	    AC_DEFINE 'if(x)' 'if( (x) != 0 )' ;;
 esac
 
-if AC_CHECK_BASENAME; then
-    AC_DEFINE HAVE_BASENAME 1
-    if AC_CHECK_HEADERS libgen.h; then
-	echo "#include <libgen.h>" >> $__cwd/config.h
-    fi
-fi
+AC_CHECK_BASENAME
 AC_CHECK_HEADERS regex.h || AC_FAIL "Cannot build secho without <regex.h>"
 
 echo > /tmp/ngc$$.c << EOF
