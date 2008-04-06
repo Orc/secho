@@ -1,15 +1,13 @@
 /*
  * silly echo
  */
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdarg.h>
-#ifdef linux
 #include <unistd.h>
-#else
-#include <libgen.h>
-#endif
 #include <regex.h>
 
 #include "cstring.h"
