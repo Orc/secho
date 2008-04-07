@@ -52,6 +52,10 @@ Cstring oline = { 0 };
 Cstring arg = { 0 }, command = { 0 };
 
 
+void printfmt(FILE *, char*, unsigned char);
+void printc(unsigned char, FILE *);
+
+
 #ifndef HAVE_BASENAME
 char *
 basename(char *p)
@@ -182,64 +186,63 @@ docommand(FILE *out)
 /* display a number in base <n>
  */
 void
-basen(unsigned int c)
+basen(unsigned int c, FILE *out)
 {
     static char base32[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
     if ( c/base )
-	basen(c/base);
+	basen(c/base, out);
     c %= base;
     switch (whichcase) {
-    case UPPERCASE: EXPAND(arg) = tolower(base32[c]); break;
-    case LOWERCASE: EXPAND(arg) = toupper(base32[c]); break;
-    default:        EXPAND(arg) = base32[c]; break;
+    case UPPERCASE: printc(toupper(base32[c]), out); break;
+    case LOWERCASE: printc(tolower(base32[c]), out); break;
+    default:        printc(base32[c], out);          break;
     }
 }
 
 
-/* add a character to the argument buffer, processing it according
- * to whichever of the bewildering collection of options were
- * used.
+/* print a character, processing it according to whichever of the
+ * bewildering collection of options were used.
  */
 void
-outc(unsigned char c)
+outc(unsigned char c, FILE *out)
 {
     int i;
     
     switch (format) {
     case ASCII:
 	    if ( (c == '') && !doescapes ) {
-		EXPAND(arg) = '^';
-		EXPAND(arg) = '[';
+		printc('^', out);
+		printc('[', out);
 		break;
 	    }
 	    if ( !isprint(c) ) {
 		if ( nononprint ) break;
-		if ( visnonprint ) { Cprintf(&arg, "%#o", c); break; }
+		if ( visnonprint ) { printfmt(out, "%#o", c); break; }
 	    }
 	    switch (whichcase) {
-	    case UPPERCASE: EXPAND(arg) = toupper(c); break;
-	    case LOWERCASE: EXPAND(arg) = tolower(c); break;
-	    default: EXPAND(arg) = c; break;
+	    case UPPERCASE: printc(toupper(c), out); break;
+	    case LOWERCASE: printc(tolower(c), out); break;
+	    default:        printc(c, out);          break;
 	    }
 	    break;
     case BINARY:
 	    EXPAND(arg) = ' ';
 	    for (i=7; i; --i)
-		EXPAND(arg) = c & (1<<i) ? '1': '0';
+		printc( c & (1<<i) ? '1': '0', out);
 	    break;
     case OCTAL:
-	    Cprintf(&arg, " %03o", c);
+	    printfmt(out, " %03o", c);
 	    break;
     case DECIMAL:
-	    Cprintf(&arg, " %d", c);
+	    printfmt(out, " %d", c);
 	    break;
     case HEX:
-	    Cprintf(&arg, (whichcase==UPPERCASE)?" %02X":" %02x", c);
+	    printfmt(out, (whichcase==UPPERCASE)?" %02X":" %02x", c);
 	    break;
     default:
-	    EXPAND(arg) = ' ';
-	    basen(c);
+	    printc(' ', out);
+	    basen(c, out);
 	    break;
     }
 }
@@ -269,10 +272,28 @@ flush(FILE *out)
 }
 
 
+/* write a character (in some arbitrary printf format)
+ * to the output buffer
+ */
+void
+printfmt(FILE *out, char *fmt, unsigned char arg)
+{
+    int i;
+    static Cstring Ppbuf = { 0 };
+
+    S(Ppbuf) = 0;
+    Cprintf(&Ppbuf, fmt, arg);
+
+    for (i=0; i < S(Ppbuf); i++)
+	printc(T(Ppbuf)[i], out);
+}
+
+ 
 /* write a character to the output buffer, printing
  * as necessary.
  */
-printc(char c, FILE *out)
+void
+printc(unsigned char c, FILE *out)
 {
     if ( width ) {
 	int tb;
@@ -321,9 +342,9 @@ printarg(FILE *out)
     if ( counter > 1 )
 	printc(outputdelim, out);
     if ( numbered )
-	Cprintf(&oline, "%d\t", counter);
+	printfmt(out, "%d\t", counter);
     for (i=0; i < S(arg); i++)
-	printc(T(arg)[i], out);
+	outc(T(arg)[i], out);
 }
 
 
@@ -339,7 +360,7 @@ filetokens(FILE *in, FILE *out)
 	S(arg) = 0;
 
 	while ( (c = getc(in)) != EOF && c != mydelim )
-	    outc(c);
+	    EXPAND(arg) = c;
 	if ( (c == EOF) && (S(arg) == 0) )
 	    break;
 
@@ -367,7 +388,7 @@ cmdtokens(char *in, FILE *out)
 	S(arg) = 0;
 
 	while ( *in && (*in != delim) )
-	    outc(*in++);
+	    EXPAND(arg) = *in++;
 
 	if ( *in ) ++in;
 
