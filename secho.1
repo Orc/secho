@@ -7,7 +7,7 @@
 .Nd echo arguments in many silly ways
 .Sh SYNOPSIS
 .Nm
-.Op Fl 019abCDEeilmNnIqtuVvwXx
+.Op Fl 019abCDEeilmNnIqRtuVvwXx
 .Op Fl B Ar base
 .Op Fl c Ar cmd
 .Op Fl d Ar char
@@ -66,6 +66,8 @@ Output in octal.
 Write to file instead of standard output.
 .It Fl q
 "Quiet mode:" redirect output to /dev/null if not to a file.
+.It Fl R
+Print output in roman numerals.
 .It Fl r Ar re
 Print every string that matches each regular expression. Regular  
 expressions cannot contain + or * modifiers.
@@ -91,6 +93,10 @@ Output in uppercase hexadecimal.
 Output in lowercase hexadecimal.
 .Sh BUGS
 The ultimate echo, actually useful, but no one wants it.
+.br
+Regular expressions can use ``*''.
+.br
+Multi-column mode is not implemented.
 .Sh AUTHOR
 .An David Parsons
 .Pq Li orc@pell.chi.il.us

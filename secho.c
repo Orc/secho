@@ -20,7 +20,7 @@
 
 #include "cstring.h"
 
-enum { ASCII, BINARY, HEX, OCTAL, DECIMAL,BASEN } format = ASCII;
+enum { ASCII, BINARY, HEX, OCTAL, DECIMAL, BASEN, SPQR } format = ASCII;
 int base;		/* -B <base> */
 enum { UPPERCASE, LOWERCASE, ASIS } whichcase = ASIS;
 int zero = 0;
@@ -112,14 +112,14 @@ xrealloc(void *ptr, int size)
 #define realloc xrealloc
 
 
-#define OPTSTRING	"?019abCDEeilmnNOqtuVvwXxB:c:d:f:L:o:r:S:s:"
+#define OPTSTRING	"?019abCDEeilmnNOqRtuVvwXxB:c:d:f:L:o:r:S:s:"
 
 /* spit out a usage message, then die
  */
 void
 usage(int rc)
 {
-    fprintf(stderr, "usage: %s [-?019abCDEeilmNnOqtuVvwXx]\n"
+    fprintf(stderr, "usage: %s [-?019abCDEeilmNnOqRtuVvwXx]\n"
 		    "       %*s [-B base] [-c cmd] [-d char] [-f file] [-L len]\n"
 		    "       %*s [-o file] [-r regex] [-S voice] [-s char] "
 		    "[args...]\n", pgm, strlen(pgm), "", strlen(pgm), "");
@@ -201,6 +201,38 @@ basen(unsigned int c, FILE *out)
 }
 
 
+/*
+ * roman numeral output
+ */
+char *r1to10[] =  {  "2",   "0", "00",  "000",  "01",
+		     "1", "10", "100", "1000", "02" };
+
+struct {
+    int val;
+    char let[3];
+} d_r[] = { { 0, "???" },
+	    { 1, "IVX" },       { 10, "XLC" },    { 100, "CDM" },
+	    { 1000, "Mvx" }, { 10000, "xlc" }, { 100000, "cdm" }, };
+	    
+#define NRDR	(sizeof d_r / sizeof d_r[0])
+
+void
+baser(FILE *out, unsigned char number)
+{
+    int i, j, rep;
+
+    if ( number == 0 )
+	printfmt(out, "nil", 0);
+    else
+	for ( i=6; i > 0; --i ) {
+	    if ( rep = (number / d_r[i].val) )
+		for (j=0; r1to10[rep][j]; j++)
+		    printc(d_r[i].let[r1to10[rep][j]-'0'], out);
+	    number %= d_r[i].val;
+	}
+}
+
+
 /* print a character, processing it according to whichever of the
  * bewildering collection of options were used.
  */
@@ -239,6 +271,10 @@ outc(unsigned char c, FILE *out)
 	    break;
     case HEX:
 	    printfmt(out, (whichcase==UPPERCASE)?" %02X":" %02x", c);
+	    break;
+    case SPQR:
+	    printc(' ', out);
+	    baser(out, c);
 	    break;
     default:
 	    printc(' ', out);
@@ -474,6 +510,7 @@ char **argv;
 			    die("can't write to %s", optarg);
 			break;
 	case 'q':	quiet = 1; break;
+	case 'R':	format = SPQR; whichcase = ASIS; break;
 	case 'r':	add_re(optarg); break;
 	case 'S':	voice = optarg; die("-S is not implemented here"); break;
 	case 's':	outputdelim='\t'; break;
