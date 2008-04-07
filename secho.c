@@ -227,7 +227,7 @@ outc(unsigned char c, FILE *out)
 	    }
 	    break;
     case BINARY:
-	    EXPAND(arg) = ' ';
+	    printc(' ', out);
 	    for (i=7; i; --i)
 		printc( c & (1<<i) ? '1': '0', out);
 	    break;
