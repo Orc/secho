@@ -18,9 +18,25 @@ case "$AC_CC $AC_CFLAGS" in
 esac
 
 AC_CHECK_BASENAME
-AC_CHECK_HEADERS regex.h || AC_FAIL "Cannot build secho without <regex.h>"
+if AC_CHECK_HEADERS getopt.h; then
+    echo "#include <getopt.h>" >> $__cwd/config.h
+fi
 
-echo > /tmp/ngc$$.c << EOF
+LOGN "Looking for <regex.h>"
+if AC_QUIET AC_CHECK_HEADERS regex.h; then
+    LOG " ok"
+elif AC_QUIET AC_CHECK_HEADERS sys/types.h regex.h; then
+    LOG " (requires <sys/types.h>)"
+    echo "#include <sys/types.h>" >> $__cwd/config.h
+    sys_types_needed=1
+else
+    LOG " (not found)"
+    AC_FAIL "Cannot build secho without <regex.h>"
+fi
+
+( 
+test "$sys_types_needed" && echo "#include <sys/types.h>"
+cat - << EOF
 #include <regex.h>
 
 main()
@@ -28,6 +44,7 @@ main()
     int i = REG_BASIC;
 }
 EOF
+) > /tmp/ngc$$.c
 
 LOGN "Is REG_BASIC defined in regex.h? "
 if $AC_CC -c -o /tmp/ngc$$ /tmp/ngc$$.c $LIBS; then
