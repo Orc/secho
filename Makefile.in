@@ -2,7 +2,7 @@ CC=@CC@
 bindir=@exedir@
 mandir=@mandir@
 
-secho: secho.c cstring.h
+secho: secho.c cstring.h config.h
 	$(CC) -o secho secho.c
 
 clean:
