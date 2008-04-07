@@ -8,8 +8,8 @@ secho: secho.c cstring.h config.h
 clean:
 	rm -f secho secho.o
 
-spotless: clean
-	rm -f @GENERATED_FILES@
+distclean spotless: clean
+	rm -f @GENERATED_FILES@ @CONFIGURE_FILES@
 
 install: secho
 	@INSTALL_PROGRAM@ secho $(bindir)
