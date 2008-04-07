@@ -1,5 +1,11 @@
 /*
- * silly echo
+ * silly echo, inspired by a mocking discussion on the
+ * plan 9 mailing list.
+ *
+ * Copyright (c) 2008 by David Loren Parsons.  All rights reserved.
+ *
+ * Distribution terms for this piece of work are found in the file
+ * COPYRIGHT, which must be distributed with this code.
  */
 #include "config.h"
 
@@ -12,6 +18,9 @@
 # include <libgen.h>
 #endif
 #include <regex.h>
+
+#define malloc xmalloc
+#define realloc xrealloc
 
 #include "cstring.h"
 
@@ -57,6 +66,9 @@ basename(char *p)
 }
 #endif
 
+
+/* whine bitterly about something, then die
+ */
 void
 die(char *fmt, ...)
 {
@@ -72,8 +84,36 @@ die(char *fmt, ...)
 }
 
 
+/* allocate memory or die trying
+ */
+void *
+xmalloc(int size)
+{
+    void *ret = malloc(size);
+
+    if ( ret ) return ret;
+
+    die("cannot allocate %d byte%s\n", size, (size==1)?"":"s");
+}
+
+
+/* reallocate memory or die trying
+ */
+void *
+xrealloc(void *ptr, int size)
+{
+    void *ret = realloc(ptr, size);
+
+    if ( ret ) return ret;
+
+    die("cannot reallocate %d byte%s\n", size, (size==1)?"":"s");
+}
+
+
 #define OPTSTRING	"?019abCDEeilmnNOqtuVvwXxB:c:d:f:L:o:r:S:s:"
 
+/* spit out a usage message, then die
+ */
 void
 usage(int rc)
 {
@@ -85,6 +125,8 @@ usage(int rc)
 }
 
 
+/* printf onto the end of a Cstring
+ */
 void
 Cprintf(Cstring *arg, char *fmt, ...)
 {
@@ -115,6 +157,9 @@ Cprintf(Cstring *arg, char *fmt, ...)
 }
 
 
+/* do a command, replacing every instance of $? with the
+ * current argument.
+ */
 void
 docommand(FILE *out)
 {
@@ -136,6 +181,8 @@ docommand(FILE *out)
 }
 
 
+/* display a number in base <n>
+ */
 void
 basen(unsigned int c)
 {
@@ -152,6 +199,10 @@ basen(unsigned int c)
 }
 
 
+/* add a character to the argument buffer, processing it according
+ * to whichever of the bewildering collection of options were
+ * used.
+ */
 void
 outc(unsigned char c)
 {
@@ -196,6 +247,9 @@ outc(unsigned char c)
 }
 
 
+/* match a string against every regular expression give,
+ * only returning 1 of nothing matches.
+ */
 int
 match_re(char *text)
 {
@@ -208,6 +262,8 @@ match_re(char *text)
 }
 
 
+/* flush any leftover parts of the output buffer
+ */
 flush(FILE *out)
 {
     fwrite(T(oline), S(oline), 1, out);
@@ -215,6 +271,9 @@ flush(FILE *out)
 }
 
 
+/* write a character to the output buffer, printing
+ * as necessary.
+ */
 printc(char c, FILE *out)
 {
     if ( width ) {
@@ -254,6 +313,8 @@ printc(char c, FILE *out)
 }
 
 
+/* print an argument.
+ */
 void
 printarg(FILE *out)
 {
@@ -268,6 +329,8 @@ printarg(FILE *out)
 }
 
 
+/* read arguments from a file.
+ */
 void
 filetokens(FILE *in, FILE *out)
 {
@@ -297,6 +360,8 @@ filetokens(FILE *in, FILE *out)
 }
 
 
+/* read arguments off the command line
+ */
 void
 cmdtokens(char *in, FILE *out)
 {
@@ -323,6 +388,8 @@ cmdtokens(char *in, FILE *out)
 }
 
 
+/* add a new regular expression to the gantlet
+ */
 void
 add_re(char *pat)
 {
@@ -341,6 +408,8 @@ add_re(char *pat)
 }
 
 
+/* frankenecho, in the flesh
+ */
 main(argc, argv)
 int argc;
 char **argv;
