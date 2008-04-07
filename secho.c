@@ -19,9 +19,6 @@
 #endif
 #include <regex.h>
 
-#define malloc xmalloc
-#define realloc xrealloc
-
 #include "cstring.h"
 
 enum { ASCII, BINARY, HEX, OCTAL, DECIMAL,BASEN } format = ASCII;
@@ -95,6 +92,7 @@ xmalloc(int size)
 
     die("cannot allocate %d byte%s\n", size, (size==1)?"":"s");
 }
+#define malloc xmalloc
 
 
 /* reallocate memory or die trying
@@ -108,6 +106,7 @@ xrealloc(void *ptr, int size)
 
     die("cannot reallocate %d byte%s\n", size, (size==1)?"":"s");
 }
+#define realloc xrealloc
 
 
 #define OPTSTRING	"?019abCDEeilmnNOqtuVvwXxB:c:d:f:L:o:r:S:s:"
