@@ -22,10 +22,10 @@ AC_CHECK_BASENAME
 if AC_CHECK_HEADERS basis/options.h && LIBS="-lbasis" AC_CHECK_FUNCS x_getopt; then
     AC_LIBS="$AC_LIBS -lbasis"
     AC_SUB XGETOPT ''
-    echo "#include <basis/getopts.h>" >> $__cwd/config.h
+    echo "#include <basis/options.h>" >> $__cwd/config.h
 else
     AC_SUB XGETOPT options.o
-    echo '#include "basis/getopts.h"' >> $__cwd/config.h
+    echo '#include "basis/options.h"' >> $__cwd/config.h
 fi
 
 LOGN "Looking for <regex.h>"
