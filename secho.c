@@ -140,7 +140,7 @@ struct x_option options[] = {
     { 'R', 'R', "SPQR",            0, "Print output in roman numerals" },
     { 'r', 'r', "pattern",       "RE","Print every thing that matches RE" },
     { 'S', 'S', "say",        "VOICE","Send to speaker, having the given voice say it" },
-    { 's', 's', 0,             "CHAR","Separate output fields with char, default space" },
+    { 's', 's', "separator",   "CHAR","Separate output fields with CHAR" },
     { 't', 't', "tabs",            0, "Separate fields with tabs" },
     { 'u', 'u', "uppercase",       0, "Convert lowercase to uppercase" },
     { 'V', 'V', "no-nonprinting",  0, "Strip non-printing characters" },
