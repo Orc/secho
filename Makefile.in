@@ -2,8 +2,8 @@ CC=@CC@
 bindir=@exedir@
 mandir=@mandir@
 
-secho: secho.c cstring.h config.h
-	$(CC) -o secho secho.c
+secho: secho.c cstring.h config.h @XGETOPT@
+	$(CC) -o secho secho.c @XGETOPT@
 
 clean:
 	rm -f secho secho.o

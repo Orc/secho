@@ -17,6 +17,7 @@
 # include <libgen.h>
 #endif
 #include <regex.h>
+#include <basis/options.h>
 
 #include "cstring.h"
 
@@ -112,17 +113,55 @@ xrealloc(void *ptr, int size)
 #define realloc xrealloc
 
 
-#define OPTSTRING	"?019abCDEeilmnNOqRtuVvwXxB:c:d:f:L:o:r:S:s:"
+struct x_option options[] = {
+    { '?', '?', "help",            0, "Print this help message" },
+    { '0', '0', 0,                 0, "Fields are separated with nulls" },
+    { '1', '1', "single-column",   0, "One field per line" },
+    { '9', '9', "plan9",           0, "Plan 9 compatability; echo nothing if no arguments were given" },
+    { 'a', 'a', "ascii",           0, "Output in ASCII (default)" },
+    { 'B', 'B', "base",        "BASE","Output in given base, 2..32." },
+    { 'b', 'b', "binary",          0, "Output in binary" },
+    { 'C', 'C', "count",           0, "Don't echo anything; just print the number of fields" },
+    { 'c', 'c', "run",          "CMD","Run CMD on each argument, replacing $? with the argument itself" },
+    { 'D', 'D', "decimal",         0, "Output in decimal" },
+    { 'd', 'd', "delimiter",   "CHAR","Input field delimiter" },
+    { 'E', 'E', "to-stderr",       0, "Print to stderr instead of stdout" },
+    { 'e', 'e', "allow-escapes",   0, "Allow escape sequences" },
+    { 'f', 'f', "input",       "FILE","Read from FILE, then from command line (if any)" },
+    { 'i', 'i', "from-stdin",      0, "Read arguments from stdin" },
+    { 'L', 'L', "width",        "LEN","Line width set to LEN" },
+    { 'l', 'l', "lowercase",       0, "Turn uppercase to lowercase" },
+    { 'm', 'm', "multi-column",    0, "Multi-column output" },
+    { 'N', 'n', "numbered",        0, "One field per line, numbering each field" },
+    { 'n', 'n', 0,                 0, "Suppress newline" },
+    { 'O', 'O', "octal",           0, "Output in octal" },
+    { 'o', 'o', "output",      "FILE","Write to FILE instead of standard output" },
+    { 'q', 'q', "quiet",           0, "Quiet mode; redirect output to /dev/null if not to a file" },
+    { 'R', 'R', "SPQR",            0, "Print output in roman numerals" },
+    { 'r', 'r', "pattern",       "RE","Print every thing that matches RE" },
+    { 'S', 'S', "say",        "VOICE","Send to speaker, having the given voice say it" },
+    { 's', 's', 0,             "CHAR","Separate output fields with char, default space" },
+    { 't', 't', "tabs",            0, "Separate fields with tabs" },
+    { 'u', 'u', "uppercase",       0, "Convert lowercase to uppercase" },
+    { 'V', 'V', "no-nonprinting",  0, "Strip non-printing characters" },
+    { 'v', 'v', "see-nonprinting", 0, "Make non-printing characters visible" },
+    { 'X', 'X', "hexadecimal",     0, "Output in uppercase hexadecimal" },
+    { 'x', 'x', 0,                 0, "Output in lowercase hexadecimal" },
+};
+
+#define NR(x)	(sizeof x / sizeof x[0])
+
 
 /* spit out a usage message, then die
  */
 void
 usage(int rc)
 {
-    fprintf(stderr, "usage: %s [-?019abCDEeilmNnOqRtuVvwXx]\n"
-		    "       %*s [-B base] [-c cmd] [-d char] [-f file] [-L len]\n"
-		    "       %*s [-o file] [-r regex] [-S voice] [-s char] "
-		    "[args...]\n", pgm, strlen(pgm), "", strlen(pgm), "");
+    char eb[BUFSIZ];
+
+    setbuf(stderr, eb);
+    fprintf(stderr, "usage: %s [options] [args...]\n", pgm);
+    showopts(stderr, NR(options), options);
     exit(rc);
 }
 
@@ -475,14 +514,14 @@ char **argv;
 
     pgm = basename(argv[0]);
 
-    while ( (opt=getopt(argc,argv, OPTSTRING)) != EOF ) {
+    while ( (opt=x_getopt(argc,argv, NR(options), options)) != EOF ) {
 	switch (opt) {
 	case '0':	delim = 0; zero = 1; break;
 	case '1':	outputdelim='\n'; nonl = 0; break;
 	case '9':	plan9e = 1; break;
 	case 'a':	format = ASCII; break;
 	case 'B':	format = BASEN;
-			base = atoi(optarg);
+			base = atoi(x_optarg);
 			if ( base <= 0 || base > 32 )
 			    die("bad base for -B argument");
 			switch (base) {
@@ -494,26 +533,27 @@ char **argv;
 			break;
 	case 'b':	format = BINARY; break;
 	case 'C':	quiet = 2; count = 1; break;
-	case 'c':	cmd = optarg; nonl = 1; break;
-	case 'd':	delim = optarg[0]; break;
+	case 'c':	cmd = x_optarg; nonl = 1; break;
+	case 'd':	delim = x_optarg[0]; break;
 	case 'E':	output = stderr; break;
 	case 'e':	doescapes = 1; break;
-	case 'f':	filename = optarg; cmdline = 1; break;
+	case 'f':	filename = x_optarg; cmdline = 1; break;
 	case 'i':	filename = "-"; cmdline = 0; break;
-	case 'L':	width = atoi(optarg); break;
+	case 'L':	width = atoi(x_optarg); break;
 	case 'l':	whichcase = LOWERCASE; break;
 	case 'm':	multicolumn = 1; break;
 	case 'n':	nonl = 1; break;
 	case 'N':	numbered = 1; outputdelim='\n'; nonl=0; break;
 	case 'O':	format = OCTAL; break;
-	case 'o':	if ( ! (output = fopen(optarg, "w")) )
-			    die("can't write to %s", optarg);
+	case 'o':	if ( ! (output = fopen(x_optarg, "w")) )
+			    die("can't write to %s", x_optarg);
 			break;
 	case 'q':	quiet = 1; break;
 	case 'R':	format = SPQR; whichcase = ASIS; break;
-	case 'r':	add_re(optarg); break;
-	case 'S':	voice = optarg; die("-S is not implemented here"); break;
-	case 's':	outputdelim='\t'; break;
+	case 'r':	add_re(x_optarg); break;
+	case 'S':	voice = x_optarg; die("-S is not implemented here"); break;
+	case 't':	outputdelim='\t'; break;
+	case 's':	outputdelim=x_optarg[0]; break;
 	case 'u':	whichcase = UPPERCASE; break;
 	case 'V':	nononprint = 1; break;
 	case 'v':	visnonprint = 1; break;
@@ -547,7 +587,7 @@ char **argv;
     if ( cmdline ) {
 	int i;
 
-	for (i=optind; i < argc; i++)
+	for (i=x_optind; i < argc; i++)
 	    cmdtokens(argv[i], output);
     }
 

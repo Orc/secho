@@ -18,8 +18,12 @@ case "$AC_CC $AC_CFLAGS" in
 esac
 
 AC_CHECK_BASENAME
-if AC_CHECK_HEADERS getopt.h; then
-    echo "#include <getopt.h>" >> $__cwd/config.h
+
+if AC_CHECK_HEADERS basis/options.h && LIBS="-lbasis" AC_CHECK_FUNCS x_getopt; then
+    AC_LIBS="$AC_LIBS -lbasis"
+    AC_SUB XGETOPT ''
+else
+    AC_SUB XGETOPT options.o
 fi
 
 LOGN "Looking for <regex.h>"
