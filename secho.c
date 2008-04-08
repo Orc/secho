@@ -114,19 +114,21 @@ xrealloc(void *ptr, int size)
 
 struct x_option options[] = {
     { '?', '?', "help",            0, "Print this help message" },
+    { '@',  0 , "version",         0, "Print a version message" },
+    { '%',  0 , "copyright",       0, "Print the copyright notice" },
     { '0', '0', 0,                 0, "Fields are separated with nulls" },
     { '1', '1', "single-column",   0, "One field per line" },
-    { '9', '9', "plan9",           0, "Plan 9 compatability; echo nothing if no arguments were given" },
+    { '9', '9', "plan9",           0, "Plan 9 compatability; echo nothing if\nno arguments were given" },
     { 'a', 'a', "ascii",           0, "Output in ASCII (default)" },
     { 'B', 'B', "base",        "BASE","Output in given base, 2..32." },
     { 'b', 'b', "binary",          0, "Output in binary" },
-    { 'C', 'C', "count",           0, "Don't echo anything; just print the number of fields" },
-    { 'c', 'c', "run",          "CMD","Run CMD on each argument, replacing $? with the argument itself" },
+    { 'C', 'C', "count",           0, "Don't echo anything; just print the\nnumber of fields" },
+    { 'c', 'c', "run",          "CMD","Run CMD on each argument, replacing $?\nwith the argument itself" },
     { 'D', 'D', "decimal",         0, "Output in decimal" },
     { 'd', 'd', "delimiter",   "CHAR","Input field delimiter" },
     { 'E', 'E', "to-stderr",       0, "Print to stderr instead of stdout" },
     { 'e', 'e', "allow-escapes",   0, "Allow escape sequences" },
-    { 'f', 'f', "input",       "FILE","Read from FILE, then from command line (if any)" },
+    { 'f', 'f', "input",       "FILE","Read from FILE, then from command line\n(if any)" },
     { 'i', 'i', "from-stdin",      0, "Read arguments from stdin" },
     { 'L', 'L', "width",        "LEN","Line width set to LEN" },
     { 'l', 'l', "lowercase",       0, "Turn uppercase to lowercase" },
@@ -135,10 +137,10 @@ struct x_option options[] = {
     { 'n', 'n', 0,                 0, "Suppress newline" },
     { 'O', 'O', "octal",           0, "Output in octal" },
     { 'o', 'o', "output",      "FILE","Write to FILE instead of standard output" },
-    { 'q', 'q', "quiet",           0, "Quiet mode; redirect output to /dev/null if not to a file" },
+    { 'q', 'q', "quiet",           0, "Quiet mode; redirect output to /dev/null\nif not to a file" },
     { 'R', 'R', "SPQR",            0, "Print output in roman numerals" },
     { 'r', 'r', "pattern",       "RE","Print every thing that matches RE" },
-    { 'S', 'S', "say",        "VOICE","Send to speaker, having the given voice say it" },
+    { 'S', 'S', "say",        "VOICE","Send to speaker, having the given\nvoice say it" },
     { 's', 's', "separator",   "CHAR","Separate output fields with CHAR" },
     { 't', 't', "tabs",            0, "Separate fields with tabs" },
     { 'u', 'u', "uppercase",       0, "Convert lowercase to uppercase" },
@@ -508,6 +510,8 @@ int argc;
 char **argv;
 {
     int opt;
+    extern char version[];
+    extern char copyright[];
 
     opterr = 1;
 
@@ -559,6 +563,8 @@ char **argv;
 	case 'w':	wordwrap = 1; break;
 	case 'X':	format = HEX; whichcase = UPPERCASE; break;
 	case 'x':	format = HEX; whichcase = LOWERCASE; break;
+	case '@':	printf("version %s\n", version); exit(0);
+	case '%':	printf("%s\n", copyright); exit(0);
 	case '?':	usage(0);
 	default:	usage(1);
 	}
