@@ -17,7 +17,6 @@
 # include <libgen.h>
 #endif
 #include <regex.h>
-#include <basis/options.h>
 
 #include "cstring.h"
 
