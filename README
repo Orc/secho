@@ -1,0 +1,89 @@
+**Secho** was inspired by a post to the [Plan 9][] mailing list,
+where, after a round of bashing on the Unix implementation of [`echo`][echo],
+the discussion went to bashing a hypothetical FSF-style implementation of `echo`
+and eventually to:
+
+> > ##NAME##
+> > 
+> > echo: echo arguments
+> > 
+> > ##SYNOPSIS##
+> > 	
+> > echo [-1abCDEeilmNnOqrtuVvwXx] [-B base] [-c cmd] [-d char] [-f file] [-L len] [-o file] [-S voice] [-s char] [args...]
+> > 
+> > ##DESCRIPTION##
+> > 	
+> > echo outputs its arguments. It takes the following switches:
+> > 
+> > =-1=
+> >     One argument per line.
+> > =-a=
+> >     Output in ASCII. The default.
+> > =-B base=
+> >     Output in given base, 2..32. Unless `-u` also given, base > 10 shows lowercase.
+> > =-b=
+> >     Output in binary.
+> > =-C=
+> >     Don't echo anything, just print the number of fields.
+> > =-c cmd=
+> >     Run cmd on each argument, replacing `$?` with the argument itself.
+> > =-D=
+> >     Output in decimal.
+> > =-d char=
+> >     Field delimiter. Default is end of argument.
+> > =-E=
+> >     Print to standard error instead of to standard output.
+> > =-e=
+> >     Allow escape sequences
+> > =-f file=
+> >     Read from file, then from command line (if any).
+> > =-i=
+> >     Read arguments from standard input.
+> > =-L len=
+> >     Line width set to len. Default is to ignore line lengths.
+> > =-l=
+> >     Turn uppercase to lowercase.
+> > =-m=
+> >     Multi-column output.
+> > =-N=
+> >     One field per line, numbering each field.
+> > =-n=
+> >     Suppress newline.
+> > =-O=
+> >     Output in octal.
+> > =-o file=
+> >     Write to file instead of standard output.
+> > =-q=
+> >     "Quiet mode:" redirect output to `/dev/null` if not to a file.
+> > =-r=
+> >     Print every string that matches each regular expression. Regular expressions cannot contain `+` or `*` modifiers.
+> > =-S voice=
+> >     Send to speaker, having the given voice say it. If voice is a null string, use the default voice.
+> > =-s char=
+> >     Separate fields with char, default space.
+> > =-t=
+> >     Separate fields with tabs.
+> > =-u=
+> >     Convert lowercase to uppercase. With `-B`, output in uppercase letters for base > 10.
+> > =-V=
+> >     Strip non-printing characters.
+> > =-v=
+> >     Make non-printing characters visible.
+> > =-w=
+> >     If `-L` is given, word wrap instead of character wrap. Otherwise, ignored.
+> > =-X=
+> >     Output in uppercase hexadecimal.
+> > =-x=
+> >     Output in lowercase hexadecimal.
+> 
+> Test for everyone: write this echo in as little code as possible. C or rc is permitted. The rules:
+> 
+> - for C: either Standard C (no other libraries) or only libc (no other Plan 9 libraries)
+> - for rc: only use programs in the core Plan 9 distribution - no programs that I have to get myself
+> - match the behavior EXACTLY as above
+> - shortest code and fastest run time wins
+> 
+> Winner gets something cool.
+
+
+"_Oh ho_," said I, "_A challenge!_"
