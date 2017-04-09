@@ -6,10 +6,10 @@ secho: secho.c cstring.h config.h version.c copyright.c @XGETOPT@
 	$(CC) -o secho secho.c version.c copyright.c @XGETOPT@
 
 clean:
-	rm -f secho secho.o
+	rm -f secho *.o
 
 distclean spotless: clean
-	rm -f @GENERATED_FILES@ @CONFIGURE_FILES@
+	@DISTCLEAN@ @GENERATED_FILES@ @CONFIGURE_FILES@
 
 install: secho
 	@INSTALL_PROGRAM@ secho $(bindir)

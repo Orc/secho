@@ -11,9 +11,11 @@ TARGET=secho
 AC_INIT $TARGET
 
 AC_PROG_CC
+unset _MK_LIBRARIAN
 
 case "$AC_CC $AC_CFLAGS" in
-*-Wall*)    AC_DEFINE 'while(x)' 'while( (x) != 0 )'
+*-pedantic*);;
+*)          AC_DEFINE 'while(x)' 'while( (x) != 0 )'
 	    AC_DEFINE 'if(x)' 'if( (x) != 0 )' ;;
 esac
 
