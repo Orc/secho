@@ -14,8 +14,7 @@ AC_PROG_CC
 unset _MK_LIBRARIAN
 
 case "$AC_CC $AC_CFLAGS" in
-*-pedantic*);;
-*)          AC_DEFINE 'while(x)' 'while( (x) != 0 )'
+*-Wall*)    AC_DEFINE 'while(x)' 'while( (x) != 0 )'
 	    AC_DEFINE 'if(x)' 'if( (x) != 0 )' ;;
 esac
 
@@ -26,7 +25,7 @@ if AC_CHECK_HEADERS basis/options.h && LIBS="-lbasis" AC_CHECK_FUNCS x_getopt; t
     AC_SUB XGETOPT ''
     echo "#include <basis/options.h>" >> $__cwd/config.h
 else
-    AC_SUB XGETOPT options.o
+    AC_SUB XGETOPT options.c
     echo '#include "basis/options.h"' >> $__cwd/config.h
 fi
 

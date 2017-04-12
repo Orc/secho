@@ -17,7 +17,6 @@
 # include <libgen.h>
 #endif
 #include <regex.h>
-#include <ctype.h>
 
 #include "cstring.h"
 
@@ -92,9 +91,9 @@ xmalloc(int size)
 {
     void *ret = malloc(size);
 
-    if ( !ret )
-	die("cannot allocate %d byte%s\n", size, (size==1)?"":"s");
-    return ret;
+    if ( ret ) return ret;
+
+    die("cannot allocate %d byte%s\n", size, (size==1)?"":"s");
 }
 #define malloc xmalloc
 
@@ -106,9 +105,9 @@ xrealloc(void *ptr, int size)
 {
     void *ret = realloc(ptr, size);
 
-    if ( !ret )
-	die("cannot reallocate %d byte%s\n", size, (size==1)?"":"s");
-    return ret;
+    if ( ret ) return ret;
+
+    die("cannot reallocate %d byte%s\n", size, (size==1)?"":"s");
 }
 #define realloc xrealloc
 
@@ -342,7 +341,6 @@ match_re(char *text)
 
 /* flush any leftover parts of the output buffer
  */
-void
 flush(FILE *out)
 {
     fwrite(T(oline), S(oline), 1, out);
@@ -507,7 +505,6 @@ add_re(char *pat)
 
 /* frankenecho, in the flesh
  */
-int
 main(argc, argv)
 int argc;
 char **argv;
