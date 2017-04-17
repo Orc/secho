@@ -17,6 +17,7 @@
 # include <libgen.h>
 #endif
 #include <regex.h>
+#include <ctype.h>
 
 #include "cstring.h"
 
@@ -69,7 +70,7 @@ basename(char *p)
 
 /* whine bitterly about something, then die
  */
-void
+void NORETURN
 die(char *fmt, ...)
 {
     va_list ptr;
@@ -345,6 +346,7 @@ flush(FILE *out)
 {
     fwrite(T(oline), S(oline), 1, out);
     S(oline) = 0;
+    return 0;
 }
 
 

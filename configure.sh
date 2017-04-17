@@ -13,10 +13,23 @@ AC_INIT $TARGET
 AC_PROG_CC
 unset _MK_LIBRARIAN
 
-case "$AC_CC $AC_CFLAGS" in
-*-Wall*)    AC_DEFINE 'while(x)' 'while( (x) != 0 )'
-	    AC_DEFINE 'if(x)' 'if( (x) != 0 )' ;;
-esac
+if [ "IS_BROKEN_CC" ]; then
+    case "$AC_CC $AC_CFLAGS" in
+    *-pedantic*) ;;
+    *)  # hack around deficiencies in gcc and clang
+	#
+	AC_DEFINE 'while(x)' 'while( (x) != 0 )'
+	AC_DEFINE 'if(x)' 'if( (x) != 0 )'
+
+	if [ "$IS_CLANG" ]; then
+	    AC_CC="$AC_CC -Wno-implicit-int"
+	elif [ "$IS_GCC" ]; then
+	    AC_CC="$AC_CC -Wno-return-type -Wno-implicit-int"
+	fi ;;
+    esac
+fi
+
+AC_CHECK_NORETURN
 
 AC_CHECK_BASENAME
 
